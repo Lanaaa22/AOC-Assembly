@@ -19,6 +19,7 @@ int main()
     printf("Quantidade de termos: ");
     scanf("%d", &qtdTermo);
     soma = SomaPA(pTermo, uTermo, qtdTermo);
-    printf("%d\n", soma);
+    printf("A soma dos termos da PA é: %d\n", soma);
     return 0;
 }
+
