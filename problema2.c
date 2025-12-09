@@ -15,7 +15,7 @@ int main(){
         }
     }
     if (qtd_div >= 1){
-        printf("\n%d não eh primo e tem como divisores: ",n);
+        printf("\n%d nao eh primo e tem como divisores: ",n);
         for (int i = 0; i < qtd_div; i++) {
             printf("%d ", conjunto_div[i]); // Imprime o conjunto dos divisores
         }
@@ -25,5 +25,6 @@ int main(){
     return 0;
 
 }
+
 
 
