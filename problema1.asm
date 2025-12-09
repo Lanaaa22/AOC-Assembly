@@ -1,7 +1,4 @@
-;; PRATICA 1 - DEMONSTRACAO DE ESCRITA DE STRING
-
-; this macro prints a char in AL and advances
-; the current cursor position:
+;; PROBLEMA 1 - 
 
 
 org 100h
@@ -10,44 +7,99 @@ org 100h
 ; Imprime msg1
 lea dx, msg1
 mov ah, 9
-int 21h
-
-; Pula Linha:
-MOV AL, 0Dh
-MOV AH, 0Eh
-INT 10h     
-
-MOV AL, 0Ah
-MOV AH, 0Eh
-INT 10h
+int 21h     
 
 ; Le nota1
 CALL SCAN_NUM  ; Aguarda usuario digitar numero. Resultado fica em CX
-MOV n1, CX     ; Guarda o valor de CX na variavel n1     
+MOV n1, CX     ; Guarda o valor de CX na variavel n1
 
-; Imprime n1    
-lea dx, n1
-mov ah, 9
-int 21h
+; Pula linha
+PUTC 0Dh
+PUTC 0Ah
 
-; Imprime msg2    
+; Imprime msg2
 lea dx, msg2
 mov ah, 9
 int 21h
 
-; Pula Linha:
-MOV AL, 0Dh
-MOV AH, 0Eh
-INT 10h     
+; Le nota2
+CALL SCAN_NUM  ; Aguarda usuario digitar numero. Resultado fica em CX
+MOV n2, CX     ; Guarda o valor de CX na variavel n2
 
-MOV AL, 0Ah
-MOV AH, 0Eh
-INT 10h
+; Pula linha
+PUTC 0Dh
+PUTC 0Ah
 
 ; Imprime msg3    
 lea dx, msg3
 mov ah, 9
 int 21h
+
+; Le nota3
+CALL SCAN_NUM  ; Aguarda usuario digitar numero. Resultado fica em CX
+MOV n3, CX     ; Guarda o valor de CX na variavel n3
+
+; Soma as 3 notas
+MOV AX, n1
+ADD AX, n2
+ADD AX, n3
+MOV soma, AX
+
+; Faz a media entre as 3 notas
+MOV AX, soma
+MOV CX, 3
+XOR DX, DX
+DIV CX
+MOV media, AX
+
+; Pula linha
+PUTC 0Dh
+PUTC 0Ah
+
+
+;; Saida de dados 
+
+; Compara media do aluno com media de aprovacao
+MOV CX, 6
+CMP AX, CX
+
+; Se for maior ou igual a media, pula para a label "aprovado":
+JGE aprovado
+
+; Se nao:
+
+; Imprime msg_reprovado
+lea dx, msg_reprovado
+mov ah, 9
+int 21h
+
+; Pula linha
+PUTC 0Dh
+PUTC 0Ah
+
+jmp stop
+
+aprovado:
+
+; Imprime msg_aprovado
+lea dx, msg_aprovado
+mov ah, 9
+int 21h
+
+stop:
+
+; Pula linha
+PUTC 0Dh
+PUTC 0Ah
+
+; Imprime msg_media
+lea dx, msg_media
+mov ah, 9
+int 21h
+
+; Imprime media do aluno
+MOV AX, media   
+CALL PRINT_NUM
 
 ret
 
@@ -60,19 +112,28 @@ msg_aprovado db 'APROVADO! :)$'
 msg_reprovado db 'REPROVADO :($'
 msg_media db 'SUA MEDIA FOI $'       
 
-n1 dw 0
-n2 dw 0
-n3 dw 0
-media dw 0
+n1 dw ?
+n2 dw ?
+n3 dw ?
+soma dw ?
+media dw ?
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; these functions are copied from emu8086.inc ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; this macro prints a char in AL and advances
+; the current cursor position:
 PUTC    MACRO   char
         PUSH    AX
         MOV     AL, char
         MOV     AH, 0Eh
         INT     10h     
         POP     AX
-ENDM          
-          
+ENDM
+
+; gets the multi-digit SIGNED number from the keyboard,
+; and stores the result in CX register:
 SCAN_NUM        PROC    NEAR
         PUSH    DX
         PUSH    AX
@@ -98,7 +159,7 @@ next_digit:
         JE      set_minus
 
         ; check for ENTER key:
-        CMP     AL, 13  ; carriage return?
+        CMP     AL, 0Dh  ; carriage return?
         JNE     not_cr
         JMP     stop_input
 not_cr:
@@ -183,5 +244,105 @@ not_minus:
         POP     DX
         RET
 make_minus      DB      ?       ; used as a flag.
-ten             DW      10      ; used as multiplier.
-SCAN_NUM        ENDP
+SCAN_NUM        ENDP                             
+
+; this procedure prints number in AX,
+; used with PRINT_NUM_UNS to print signed numbers:
+PRINT_NUM       PROC    NEAR
+        PUSH    DX
+        PUSH    AX
+
+        CMP     AX, 0
+        JNZ     not_zero
+
+        PUTC    '0'
+        JMP     printed
+
+not_zero:
+        ; the check SIGN of AX,
+        ; make absolute if it's negative:
+        CMP     AX, 0
+        JNS     positive
+        NEG     AX
+
+        PUTC    '-'
+
+positive:
+        CALL    PRINT_NUM_UNS
+printed:
+        POP     AX
+        POP     DX
+        RET
+PRINT_NUM       ENDP
+
+; this procedure prints out an unsigned
+; number in AX (not just a single digit)
+; allowed values are from 0 to 65535 (FFFF)
+PRINT_NUM_UNS   PROC    NEAR
+        PUSH    AX
+        PUSH    BX
+        PUSH    CX
+        PUSH    DX
+
+        ; flag to prevent printing zeros before number:
+        MOV     CX, 1
+
+        ; (result of "/ 10000" is always less or equal to 9).
+        MOV     BX, 10000       ; 2710h - divider.
+
+        ; AX is zero?
+        CMP     AX, 0
+        JZ      print_zero
+
+begin_print:
+
+        ; check divider (if zero go to end_print):
+        CMP     BX,0
+        JZ      end_print
+
+        ; avoid printing zeros before number:
+        CMP     CX, 0
+        JE      calc
+        ; if AX<BX then result of DIV will be zero:
+        CMP     AX, BX
+        JB      skip
+calc:
+        MOV     CX, 0   ; set flag.
+
+        MOV     DX, 0
+        DIV     BX      ; AX = DX:AX / BX   (DX=remainder).
+
+        ; print last digit
+        ; AH is always ZERO, so it's ignored
+        ADD     AL, 30h    ; convert to ASCII code.
+        PUTC    AL
+
+
+        MOV     AX, DX  ; get remainder from last div.
+
+skip:
+        ; calculate BX=BX/10
+        PUSH    AX
+        MOV     DX, 0
+        MOV     AX, BX
+        DIV     CS:ten  ; AX = DX:AX / 10   (DX=remainder).
+        MOV     BX, AX
+        POP     AX
+
+        JMP     begin_print
+        
+print_zero:
+        PUTC    '0'
+        
+end_print:
+
+        POP     DX
+        POP     CX
+        POP     BX
+        POP     AX
+        RET
+PRINT_NUM_UNS   ENDP
+
+
+
+ten             DW      10      
