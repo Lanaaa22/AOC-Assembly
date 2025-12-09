@@ -5,7 +5,7 @@ int main(){
     int div;
     int conjunto_div[50] = {};
     int qtd_div = 0;
-    printf("Digite um número maior que 2:\n");
+    printf("Digite um numero maior que 2:\n");
     scanf("%d", &n);
     for (int div = 2; div < n; div++) {
         if (n % div == 0){
@@ -25,3 +25,4 @@ int main(){
     return 0;
 
 }
+
