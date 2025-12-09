@@ -9,7 +9,7 @@ int main(){
     for (int divisor = 2; divisor <= n/2; divisor++){
         if (n % divisor == 0 && primo){
             primo = 0;
-            printf("\n%d não eh primo e tem como divisores: ",n);
+            printf("\n%d nao eh primo e tem como divisores: ",n);
         }
         if (n % divisor == 0){
             printf("%d ",divisor);
@@ -20,4 +20,5 @@ int main(){
     }
     return 0;
 }
+
 
