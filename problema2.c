@@ -6,12 +6,12 @@ int main(){
     int primo = 1;
     printf("Digite um numero maior que 2:\n");
     scanf("%d", &n);
-    for (int div = 2; divisor < n; divisor++){
-        if (n % div == 0 && primo){
+    for (int divisor = 2; divisor < n; divisor++){
+        if (n % divisor == 0 && primo){
             primo = 0;
             printf("\n%d não eh primo e tem como divisores: ",n);
         }
-        if (n % div == 0){
+        if (n % divisor == 0){
             printf("%d ",divisor);
         }
     }
@@ -20,6 +20,7 @@ int main(){
     }
     return 0;
 }
+
 
 
 
