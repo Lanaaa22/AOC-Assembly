@@ -2,29 +2,25 @@
 
 int main(){
     int n;
-    int divisor;
-    int conjunto_div[50] = {};
-    int qtd_div = 0;
+    int div;
+    int primo = 1;
     printf("Digite um numero maior que 2:\n");
     scanf("%d", &n);
-    for (int div = 2; div < n; divisor++) {
+    for (int div = 2; div < n; div++){
+        if (n % div == 0 && primo){
+            primo = 0;
+            printf("\n%d não eh primo e tem como divisores: ",n);
+        }
         if (n % div == 0){
-            conjunto_div[qtd_div] = divisor;
-            qtd_div++;
-            
+            printf("%d ",div);
         }
     }
-    if (qtd_div >= 1){
-        printf("\n%d nao eh primo e tem como divisores: ",n);
-        for (int i = 0; i < qtd_div; i++) {
-            printf("%d ", conjunto_div[i]); // Imprime o conjunto dos divisores
-        }
-        return 0;
+    if (primo){
+        printf("\n%d eh primo",n);
     }
-    printf("\n%d eh primo",n);
     return 0;
-
 }
+
 
 
 
