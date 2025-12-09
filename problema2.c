@@ -2,14 +2,14 @@
 
 int main(){
     int n;
-    int div;
+    int divisor;
     int conjunto_div[50] = {};
     int qtd_div = 0;
     printf("Digite um numero maior que 2:\n");
     scanf("%d", &n);
-    for (int div = 2; div < n; div++) {
+    for (int div = 2; div < n; divisor++) {
         if (n % div == 0){
-            conjunto_div[qtd_div] = div;
+            conjunto_div[qtd_div] = divisor;
             qtd_div++;
             
         }
@@ -25,4 +25,5 @@ int main(){
     return 0;
 
 }
+
 
