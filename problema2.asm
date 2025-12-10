@@ -1,79 +1,117 @@
-;; PROBLEMA 1 - 
+;; PROBLEMA 2 - 
 
 
 org 100h
 
 
 ; Imprime msg
-lea dx, msg
-mov ah, 9
-int 21h     
+LEA DX, msg
+MOV AH, 9
+INT 21h     
 
 ; Le n
 CALL SCAN_NUM  ; Aguarda usuario digitar numero. Resultado fica em CX
 MOV n, CX      ; Guarda o valor de CX na variavel n
 
-; Pula linha
+; Pula duas linhas
+PUTC 0Dh
+PUTC 0Ah
 PUTC 0Dh
 PUTC 0Ah
 
 
-;; TA BUGADO PQ COPIEI DO GEMINI, FAVOR ENTENDER E DEPOIS TIRAR OS COMENTARIOS BIZONHOS DELE
-
-; --- PREPARAÇÃO ---
-; Supomos que N esteja numa variável [N]
-
-; 1. Calcular o Limite (N / 2) e guardar em CX
-MOV AX, [N]
+; Calcula o limite do loop (n/2) e armazena em CX
+MOV AX, n
 MOV BX, 2
-XOR DX, DX    ; Zera DX antes da divisão
-DIV BX        ; AX = N / 2
-MOV CX, AX    ; CX agora é o nosso LIMITE (N/2)
+XOR DX, DX
+DIV BX       
+MOV CX, AX    ; CX agora eh n/2
 
-; 2. Preparar o Divisor inicial
-MOV BX, 2     ; BX será o nosso 'divisor' no for (int divisor = 2...)
+; Prepara o divisor inicial
+MOV BX, 2     ; BX sera o divisor
 
-; --- INÍCIO DO LOOP ---
-MEU_LOOP:
-    ; 1. Verificar se o divisor (BX) já passou do limite (CX)
+
+; LOOP
+inicio_loop:
+    
+    ; Verificar se o divisor (BX) ja passou do limite (CX)
     CMP BX, CX
-    JA FIM_DO_LOOP  ; Se BX > CX (divisor > N/2), sai do loop
-                    ; JA = Jump if Above (para números sem sinal)
+    JA fim_loop         ; Se BX > CX (divisor > n/2), sai do loop
 
-    ; 2. Preparar a divisao (N % BX)
-    MOV AX, [N]     
-    XOR DX, DX      ; Zerar DX (parte alta) sempre antes de DIV
+    ; Divisao (n % BX)
+    MOV AX, n     
+    XOR DX, DX
     
-    ; 3. Dividir
-    DIV BX          ; Divide DX:AX por BX. 
-                    ; Resultado em AX, Resto em DX.
+    DIV BX              ; Divide DX:AX por BX. 
+                        ; Resultado em AX, resto em DX.
 
-    ; 4. Verificar se é divisível (Resto == 0?)
+    ; Verificar se eh divisivel (Resto == 0?)
     CMP DX, 0
-    JNE PROXIMA_ITERACAO ; Se não é 0, não é divisor, pula.
-
-    ; --- SE CHEGOU AQUI, É UM DIVISOR! ---
-    ; (Aqui você coloca o código para marcar que não é primo)
-    ; (E o código para imprimir o valor de BX que é o divisor)
+    JNE prox_iter       ; Se nao eh 0, nao eh divisor, pula
     
-PROXIMA_ITERACAO:
-    INC BX          ; divisor++
-    JMP MEU_LOOP    ; Volta para o teste do loop
+    ;; Se chegar aqui, eh divisor. Ou seja, nao eh primo.
+    
+    MOV DX, primo
+    CMP DX, 0            ; Se primo for False (0), ja imprimiu msg_nao_primo
+    JE ja_imprimiu_msg_nao_primo
+    
+    ; Seta a flag 'primo' como False (0)
+    MOV DX, 0
+    MOV primo, DX
+    
+    ; Imprime n (<n> nao eh primo e...)
+    MOV AX, n   
+    CALL PRINT_NUM
+    
+    ; Imprime msg_nao_primo
+    LEA DX, msg_nao_primo
+    MOV AH, 9
+    INT 21h
+    
+    ja_imprimiu_msg_nao_primo:
+    
+    ; Imprime o divisor descoberto pela iteracao
+    MOV AX, BX
+    CALL PRINT_NUM
+    
+    ; Da um espaco pro proximo
+    LEA DX, espaco
+    MOV AH, 9
+    INT 21H    
+    
+prox_iter:
+    
+    INC BX              ; divisor++
+    JMP inicio_loop     ; Volta para o teste do loop
 
-FIM_DO_LOOP:
-    ; Continua o código... verificar flag de primo, etc.
+fim_loop:
 
-ret
+MOV DX, primo
+CMP DX, 1               ; Se primo for True (1), eh primo
+JNE fim                 ; Se nao for True, nao eh primo, pula
+
+; Imprime n (<n> eh primo)
+MOV AX, n
+CALL PRINT_NUM
+
+; Imprime msg_primo
+LEA DX, msg_primo
+MOV AH, 9
+INT 21H
+
+fim:
+
+RET
 
 
 ; Declaracoes:
 msg db 'Digite um numero maior que 2: $'
-msg_nao_primo db 'nao eh primo e tem como divisores: $'
-msg_primo db 'eh primo $'       
+msg_nao_primo db ' nao eh primo e tem como divisores: $'
+espaco db ' $'
+msg_primo db ' eh primo$'       
 
 n dw ?
 divisor dw 2
-i dw ?
 primo dw 1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
