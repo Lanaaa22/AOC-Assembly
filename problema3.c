@@ -13,13 +13,14 @@ int main()
     printf("Primeiro termo: ");
     scanf("%d", &pTermo);
     
-    printf("Último termo: ");
+    printf("Ultimo termo: ");
     scanf("%d", &uTermo);
     
     printf("Quantidade de termos: ");
     scanf("%d", &qtdTermo);
     soma = SomaPA(pTermo, uTermo, qtdTermo);
-    printf("A soma dos termos da PA é: %d\n", soma);
+    printf("A soma dos termos da PA eh: %d\n", soma);
     return 0;
 }
+
 
