@@ -1,4 +1,4 @@
-;; PROBLEMA 2 - 
+;; PROBLEMA 2
 
 
 org 100h
@@ -342,3 +342,4 @@ PRINT_NUM_UNS   ENDP
 
 
 ten             DW      10      
+
