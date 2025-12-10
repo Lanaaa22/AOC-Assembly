@@ -6,5 +6,5 @@
 - estimativa: 4h
 - realidade: 
 ## problema3.asm
-- estimativa: 
-- realidade: 
+- estimativa: 2h
+- realidade: 30 minutos
