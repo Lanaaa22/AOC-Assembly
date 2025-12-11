@@ -14,7 +14,7 @@
 - tempo gasto: 30 minutos
 - 
 ## problema3.c
-- tempo gasto: 20 minutos
+- tempo gasto: 10 minutos
 ## problema3.asm
 - estimativa: 2h
 - realidade: 30 minutos
